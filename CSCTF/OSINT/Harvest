@@ -1,0 +1,86 @@
+# HARVEST
+
+🇻🇳 **Vietnamese version:** [osint-harvest.vi.md](./osint-harvest.vi.md)
+
+| Event | Category | Points | Solves | Solved by |
+| :--- | :--- | :--- | :--- | :--- |
+| **CSCTF 2026** | OSINT / Crypto | 270 | 94 | 🇻🇳 VIETNAM (2) |
+
+---
+
+## TL;DR
+
+Disprove the false disinformation post on Telegram by cross-referencing military flight logs and logistics records. Decrypt intercepted radio messages sent via Vigenère cipher using crew callsigns as keys to identify the actual sling-load cargo delivery site (`PP-7`) and the cargo codeword (`SNOP`).
+
+---
+
+## Challenge
+
+On 14 August 2026 at 19:42 MSK, a regional Telegram channel claimed that a Mi-24 helicopter ("bort 34") delivered cargo near Staroselye village. Handout files from the 417th Separate Helicopter Squadron (aerodrome KORLEVO) include flight schedules, logistics tables, radio procedures, and two encrypted radio intercept logs.
+
+**Question:** Where did the squadron's sling-load cargo actually go on 14 August, and what was it?
+
+---
+
+## Solution
+
+### 1. Disproving the Telegram Claim (OSINT / Intelligence Analysis)
+Analyzing `01_telegram_post.txt`, `03_flight_schedule_14AUG.txt`, and `05_logistics_sheet_14AUG.txt`:
+* **Aircraft Status:** Telegram claims **Bort 34** (Mi-24P) delivered cargo. However, the flight schedule explicitly notes Bort 34 was grounded due to main gearbox replacement (`Not before 18.08`).
+* **Landing Zone Status:** Telegram claims delivery near **Staroselye**. The logistics sheet reveals **Staroselye (PP-2)** has been **CLOSED since 02.08** due to mine hazards (Order 88).
+* **Conclusion:** The Telegram post is a disinformation distraction.
+
+### 2. Identifying Sling-Load Flights
+According to the flight schedule and logistics sheet:
+* **Bort 21** (`GRACH`): Internal cargo delivery to LIPKI aerodrome.
+* **Bort 25** (`BEREG`): External sling load scheduled for **PP-5** at 13:20–14:35.
+* **Bort 22** (`ZHATVA`): External sling load scheduled for 09:00–10:55 to an unspecified LZ ("per separate order"). Carrying cargo code **SNOP** (4 units).
+
+### 3. Decrypting Radio Intercepts (Crypto)
+Following `04_signals_instruction_extract.txt`:
+* **Algorithm:** Vigenère cipher over the standard 26-letter Latin alphabet.
+* **Word Separator:** The letter `X` denotes a space.
+* **Key:** Daily crew callsign as assigned in the flight schedule.
+
+#### Intercept #1 (Received 10:21 MSK)
+* **Time window:** Matches Bort 22's flight window (09:00–10:55 MSK).
+* **Key:** `ZHATVA` (Callsign of Bort 22).
+
+**Ciphertext:**
+```text
+CVKEV DWGHT OVZEG KPZWZ NHKXB OEMTR DEMXN TZEDH NTZCL
+XIXOW XLZMW CRXHY ZEDXN YZAXW QACAS TOXAV RMSDU HDMNA
+SEDOV XJVNX X
+```
+
+**Decrypted Text:**
+```text
+DOKLAD GRUZ SNOP CHETYRE MESTA DOSTAVLEN PP SEM VREMYA DESYAT DVA
+```
+
+**Translation:**
+> *Report: Cargo SNOP (4 pieces) delivered PP 7 time 10:02.*
+
+#### Intercept #2 (Received 16:34 MSK)
+* **Key:** `BEREG` (Callsign of Bort 25).
+* Decrypts to a confirmation of cargo `MESHOK` delivered to `PP-5`.
+
+---
+
+## Verification
+
+* **Destination:** Landing site **PP-7** (Mirnoe, harvested field west of the dairy farm).
+* **Cargo:** Codeword **SNOP** (Portable EW jamming set).
+
+---
+
+## Flag
+
+`CSCTF{PP-7_SNOP}`
+
+---
+
+## What I Learned
+
+* **OSINT Sanity Checks:** Always cross-reference public OSINT / social media claims against official internal logs to spot propaganda or misinformation.
+* **Context-Driven Cryptanalysis:** Combining operational timestamps with flight callsigns drastically narrows down possible decryption keys in field cipher problems.
