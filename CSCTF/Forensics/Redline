@@ -1,0 +1,27 @@
+# Redline
+🇻🇳 Vietnamese version: [forensics-redline.vi.md](./forensics-redline.vi.md)
+
+Event | Category | Points | Solves | Solved by
+--- | --- | --- | --- | ---
+CSCTF 2026 | Forensics | 120 | 251 | VIETNAM (2)
+
+### TL;DR
+The provided `.docx` file contains a leftover revision comment (`[SK1]`) indicating the policy was altered before distribution. By reading the document's text and revision notes, we can identify both the modified authorization and the originally approved authorization code (the flag).
+
+### Challenge
+`CC-11_excursion_directive.docx`. A cold-chain excursion directive was sent to depot crews, but a crew lead suspects it was altered from the originally approved version. The objective is to work out how the version that reached the crews differs from what was actually approved, who changed it, and recover the original excursion authorization.
+
+### Solution
+1. **Analyze the Document**: Opening the `.docx` file reveals the text of the Meridian Relief Network directive.
+2. **Identify the Artifacts**: The text contains an editor's note marked as `[SK1]`. The comment explicitly states: *"Per tonight's dispatch throughput directive I am dropping the quarantine hold - Depot 7 backlog is too high to sideline stock. Re-issuing under a fresh authorization."*
+3. **Extract the Flags**: Because the editor didn't properly sanitize the document, both authorizations are left in the text:
+   * The new, altered authorization (Supervisor Override): `CSCTF{dispatch_0f7c0c00aac69bbb86d6b96391f5d112}`
+   * The original, approved authorization (Quarantine Protocol): `CSCTF{redline_21ee9b19d342e06432165fb2b6f64e06}`
+4. **Submit**: The briefing specifically asks to "recover the original excursion authorization", so the correct flag is the `redline` one.
+
+### Flag
+`CSCTF{redline_21ee9b19d342e06432165fb2b6f64e06}`
+
+### What I learned
+* MS Word documents (`.docx`) often retain Track Changes, editor comments, and revision histories that can inadvertently leak sensitive prior versions of a text.
+* Document sanitization (removing metadata, comments, and hidden text) is crucial before distributing finalized policies to avoid exposing internal decision-making or overridden protocols.
